@@ -1,0 +1,11 @@
+<div class="panel panel-right">
+  <div class="panel-header">Assistant</div>
+  <div class="panel-body" id="messages"></div>
+  <div id="loading">● ● ●</div>
+  <div id="input-area">
+    <input id="prompt" placeholder="Add a 9am standup tomorrow..." onkeydown="if(event.key==='Enter')sendPrompt()">
+    <button onclick="sendPrompt()">Send</button>
+  </div>
+  <div class="panel-header">To-Do</div>
+  <div class="todo-list" id="todo-list"><p class="cal-empty">No todos yet.</p></div>
+</div>

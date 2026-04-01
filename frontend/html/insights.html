@@ -1,0 +1,19 @@
+<div class="insights-header">
+  <span class="panel-header" style="border:none;padding:0.4rem 0">Insights</span>
+  <div style="display:flex;align-items:center;gap:0.6rem">
+    <select id="insights-view" onchange="loadInsights()">
+      <option value="week">Week</option>
+      <option value="day-sunday">Sun</option>
+      <option value="day-monday">Mon</option>
+      <option value="day-tuesday">Tue</option>
+      <option value="day-wednesday">Wed</option>
+      <option value="day-thursday">Thu</option>
+      <option value="day-friday">Fri</option>
+      <option value="day-saturday">Sat</option>
+    </select>
+    <label style="font-size:0.7rem;color:#888;display:flex;align-items:center;gap:3px">
+      <input type="checkbox" id="from-now" onchange="loadInsights()"> From now
+    </label>
+  </div>
+</div>
+<div id="insights-content"><p class="cal-empty">Loading insights...</p></div>

@@ -1,0 +1,13 @@
+<div class="panel panel-left">
+  <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
+    <span id="schedule-title">Routine</span>
+    <select id="schedule-type" onchange="switchScheduleView()">
+      <option value="routine">Routine</option>
+      <option value="custom">Custom</option>
+    </select>
+  </div>
+  <div class="panel-body" id="schedule-table">
+    <p class="cal-empty">No schedules yet. Use the chat to add events.</p>
+  </div>
+  <div class="insights-bar" id="insights-partial"></div>
+</div>
