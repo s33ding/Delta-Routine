@@ -2,6 +2,8 @@
 
 Precision time-budgeting engine powered by AI. Manage your weekly routine, custom events, and todos through a conversational assistant.
 
+🔗 **[Launch App](https://s33ding-delta-routine.s3.amazonaws.com/index.html)**
+
 ## Architecture
 
 ```
