@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Source Sans 3', sans-serif; background: #f4f4f4; color: #333; height: 100vh; display: flex; flex-direction: column; }
+header { padding: 0.6rem 1.5rem; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #d0d0d0; }
+header strong { font-family: 'Lora', serif; font-size: 1.15rem; font-weight: 600; color: #444; letter-spacing: 0.5px; }
+button { background: #555; color: #fff; border: none; padding: 0.35rem 0.9rem; border-radius: 3px; cursor: pointer; font-size: 0.78rem; font-family: 'Source Sans 3', sans-serif; letter-spacing: 0.3px; }
+button:hover { background: #333; }
+.main { display: flex; flex: 1; overflow: hidden; }
+.panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.panel-left { flex: 2; background: #fff; }
+.panel-right { flex: 1; background: #fafafa; border-left: 1px solid #d0d0d0; min-width: 300px; }
+.panel-header { padding: 0.5rem 1rem; font-family: 'Lora', serif; font-weight: 600; color: #555; border-bottom: 1px solid #d0d0d0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; }
+.panel-body { flex: 1; overflow-y: auto; padding: 0; }
+
+/* Calendar */
+.cal-grid { width: 100%; border-collapse: collapse; }
+.cal-grid th { padding: 0.5rem 0; text-align: center; font-size: 0.68rem; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #aaa; }
+.cal-grid td { border-right: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0; vertical-align: top; padding: 4px; width: 14.28%; height: 80px; }
+.cal-grid td:last-child { border-right: none; }
+.cal-event { color: #fff; border-radius: 3px; padding: 4px 7px; margin-bottom: 3px; font-size: 0.75rem; line-height: 1.4; border: 1px solid rgba(0,0,0,0.25); border-left: 3px solid rgba(0,0,0,0.2); text-shadow: 0 2px 6px rgba(0,0,0,0.6); }
+.cal-event .ev-time { color: rgba(255,255,255,0.9); font-size: 0.65rem; font-weight: 600; }
+.cal-event .ev-title { font-weight: 600; font-size: 0.78rem; }
+.cal-event.cat-health { background: #9e6878; }
+.cal-event.cat-work { background: #5e7e94; }
+.cal-event.cat-personal { background: #94705e; }
+.cal-event.cat-learning { background: #6a946a; }
+.cal-event.cat-other { background: #7e7494; }
+.cal-empty { color: #aaa; text-align: center; padding: 2rem; font-size: 0.85rem; font-style: italic; }
+
+/* Chat */
+#messages { padding: 0.75rem; }
+.msg { margin-bottom: 0.5rem; font-size: 0.82rem; padding: 0.4rem 0.7rem; border-radius: 6px; max-width: 90%; line-height: 1.4; }
+.msg.user { background: #e8e8e8; color: #333; margin-left: auto; border-bottom-right-radius: 2px; }
+.msg.bot { background: #fff; color: #333; border: 1px solid #ddd; border-bottom-left-radius: 2px; }
+#loading { display: none; color: #999; font-size: 0.78rem; padding: 0.4rem 1rem; font-style: italic; }
+#input-area { display: flex; border-top: 1px solid #d0d0d0; padding: 0.5rem; gap: 0.5rem; background: #f4f4f4; }
+#input-area input { flex: 1; border: 1px solid #ccc; padding: 0.55rem 0.9rem; font-size: 0.82rem; outline: none; background: #fff; color: #333; border-radius: 3px; font-family: 'Source Sans 3', sans-serif; }
+#input-area input:focus { border-color: #888; }
+#input-area button { border-radius: 3px; padding: 0.55rem 1rem; }
+
+/* Login */
+#login-section { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 1.2rem; background: #f4f4f4; }
+#login-section h1 { font-family: 'Lora', serif; color: #444; font-weight: 600; font-size: 2rem; letter-spacing: 1px; }
+#login-section p { color: #888; font-size: 0.9rem; font-style: italic; }
+
+/* Insights */
+.insights-bar { border-top: 1px solid #d0d0d0; padding: 0.5rem 1rem; background: #fafafa; }
+.insights-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.insights-header select { font-family: 'Source Sans 3', sans-serif; font-size: 0.75rem; border: 1px solid #ccc; border-radius: 3px; padding: 0.2rem 0.4rem; background: #fff; color: #555; }
+.insights-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
+.insight-block { flex: 1; min-width: 120px; }
+.insight-block h4 { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 0.3rem; font-family: 'Lora', serif; }
+.insight-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; padding: 0.15rem 0; }
+.insight-row .label { color: #555; }
+.insight-row .value { font-weight: 600; color: #333; }
+.insight-bar-bg { height: 6px; background: #e8e8e8; border-radius: 3px; flex: 1; margin: 0 0.5rem; }
+.insight-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.insight-summary { display: flex; gap: 1.5rem; margin-bottom: 0.5rem; }
+.insight-stat { text-align: center; }
+.insight-stat .num { font-size: 1.1rem; font-weight: 600; color: #444; }
+.insight-stat .lbl { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.insight-stacked { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 0.6rem; background: #e8e8e8; }
+.insight-stacked-seg { height: 100%; transition: width 0.3s; }
+
+/* Todos */
+.todo-list { padding: 0.5rem 0.75rem; overflow-y: auto; max-height: 200px; }
+.todo-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0; font-size: 0.8rem; border-bottom: 1px solid #eee; }
+.todo-item.done .todo-text { text-decoration: line-through; color: #aaa; }
+.todo-text { flex: 1; }
+.todo-priority { font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; color: #fff; }
+.todo-priority.high { background: #946e6e; }
+.todo-priority.medium { background: #948e5e; }
+.todo-priority.low { background: #6a946a; }
+
+/* Schedule type selector */
+#schedule-type { font-family: 'Source Sans 3', sans-serif; font-size: 0.75rem; border: 1px solid #ccc; border-radius: 3px; padding: 0.15rem 0.4rem; background: #fff; color: #555; }

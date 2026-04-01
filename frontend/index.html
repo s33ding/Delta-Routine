@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Delta-Routine</title>
+  <script>if(location.protocol==='http:')location.href=location.href.replace('http://s33ding-delta-routine.s3-website-us-east-1.amazonaws.com','https://s33ding-delta-routine.s3.amazonaws.com');</script>
+  <link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body>
+  <div id="login-section">
+    <h1>Delta-Routine</h1>
+    <p>Precision time-budgeting engine</p>
+    <button style="padding:0.6rem 2rem;font-size:0.9rem" onclick="loginGoogle()">Sign In with Google</button>
+  </div>
+  <div id="app-section" style="display:none;flex-direction:column;height:100vh">
+    <header>
+      <strong>Delta-Routine</strong>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <span style="font-size:0.8rem" id="user-email"></span>
+        <button onclick="logout()">Sign Out</button>
+      </div>
+    </header>
+    <div class="main">
+      <div class="panel panel-left">
+        <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
+          <span id="schedule-title">Routine</span>
+          <select id="schedule-type" onchange="switchScheduleView()">
+            <option value="routine">Routine</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="panel-body" id="schedule-table"><p class="cal-empty">No schedules yet. Use the chat to add events.</p></div>
+        <div class="insights-bar">
+          <div class="insights-header">
+            <span class="panel-header" style="border:none;padding:0.4rem 0">Insights</span>
+            <div style="display:flex;align-items:center;gap:0.6rem">
+              <select id="insights-view" onchange="loadInsights()">
+                <option value="week">Week</option>
+                <option value="day-sunday">Sun</option>
+                <option value="day-monday">Mon</option>
+                <option value="day-tuesday">Tue</option>
+                <option value="day-wednesday">Wed</option>
+                <option value="day-thursday">Thu</option>
+                <option value="day-friday">Fri</option>
+                <option value="day-saturday">Sat</option>
+              </select>
+              <label style="font-size:0.7rem;color:#888;display:flex;align-items:center;gap:3px"><input type="checkbox" id="from-now" onchange="loadInsights()"> From now</label>
+            </div>
+          </div>
+          <div id="insights-content"><p class="cal-empty">Loading insights...</p></div>
+        </div>
+      </div>
+      <div class="panel panel-right">
+        <div class="panel-header">Assistant</div>
+        <div class="panel-body" id="messages"></div>
+        <div id="loading">● ● ●</div>
+        <div id="input-area">
+          <input id="prompt" placeholder="Add a 9am standup tomorrow..." onkeydown="if(event.key==='Enter')sendPrompt()">
+          <button onclick="sendPrompt()">Send</button>
+        </div>
+        <div class="panel-header">To-Do</div>
+        <div class="todo-list" id="todo-list"><p class="cal-empty">No todos yet.</p></div>
+      </div>
+    </div>
+  </div>
+  <script src="js/app.js?v=4"></script>
+</body>
+</html>

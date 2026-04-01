@@ -1,0 +1,267 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Delta-Routine - AI-powered schedule management
+
+Globals:
+  Function:
+    Timeout: 60
+    Runtime: python3.12
+    MemorySize: 256
+
+Resources:
+  ScheduleTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: delta-routine-schedules
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: schedule_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+        - AttributeName: schedule_id
+          KeyType: RANGE
+
+  ConversationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: delta-routine-conversations
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  SettingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: delta-routine-settings
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+
+  TodoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: delta-routine-todos
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: todo_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+        - AttributeName: todo_id
+          KeyType: RANGE
+
+  AgentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delta-routine-agent
+      CodeUri: src/agent/
+      Handler: app.handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ScheduleTable
+          CONVERSATION_TABLE: !Ref ConversationTable
+          SETTINGS_TABLE: !Ref SettingsTable
+          TODO_TABLE: !Ref TodoTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ScheduleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ConversationTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SettingsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TodoTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: "*"
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /agent
+            Method: post
+            RestApiId: !Ref AppApi
+        Options:
+          Type: Api
+          Properties:
+            Path: /agent
+            Method: options
+            RestApiId: !Ref AppApi
+            Auth:
+              Authorizer: NONE
+
+  SchedulesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delta-routine-schedules
+      CodeUri: src/schedules/
+      Handler: app.handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ScheduleTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ScheduleTable
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            Path: /schedules
+            Method: get
+            RestApiId: !Ref AppApi
+        Options:
+          Type: Api
+          Properties:
+            Path: /schedules
+            Method: options
+            RestApiId: !Ref AppApi
+            Auth:
+              Authorizer: NONE
+
+  SettingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delta-routine-settings
+      CodeUri: src/settings/
+      Handler: app.handler
+      Environment:
+        Variables:
+          SETTINGS_TABLE: !Ref SettingsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SettingsTable
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            Path: /settings
+            Method: get
+            RestApiId: !Ref AppApi
+        Put:
+          Type: Api
+          Properties:
+            Path: /settings
+            Method: put
+            RestApiId: !Ref AppApi
+        Options:
+          Type: Api
+          Properties:
+            Path: /settings
+            Method: options
+            RestApiId: !Ref AppApi
+            Auth:
+              Authorizer: NONE
+
+  TodosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delta-routine-todos
+      CodeUri: src/todos/
+      Handler: app.handler
+      Environment:
+        Variables:
+          TODO_TABLE: !Ref TodoTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TodoTable
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            Path: /todos
+            Method: get
+            RestApiId: !Ref AppApi
+        Options:
+          Type: Api
+          Properties:
+            Path: /todos
+            Method: options
+            RestApiId: !Ref AppApi
+            Auth:
+              Authorizer: NONE
+
+  InsightsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delta-routine-insights
+      CodeUri: src/insights/
+      Handler: app.handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ScheduleTable
+          SETTINGS_TABLE: !Ref SettingsTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ScheduleTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref SettingsTable
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            Path: /insights
+            Method: get
+            RestApiId: !Ref AppApi
+        Options:
+          Type: Api
+          Properties:
+            Path: /insights
+            Method: options
+            RestApiId: !Ref AppApi
+            Auth:
+              Authorizer: NONE
+
+  AppApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowMethods: "'GET,POST,PUT,OPTIONS'"
+      GatewayResponses:
+        UNAUTHORIZED:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: arn:aws:cognito-idp:us-east-1:248189947068:userpool/us-east-1_v6NpVSzBR
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
