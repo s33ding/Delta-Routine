@@ -43,7 +43,8 @@ You MUST respond with valid JSON in this exact format:
       "todo_id": "required for toggle/delete",
       "title": "todo item text",
       "done": false,
-      "priority": "high|medium|low"
+      "urgent": true,
+      "important": true
     }
   ],
   "colors": {
@@ -57,9 +58,15 @@ SCHEDULE RULES:
 - If user says "every Monday", "on Mondays", "I swim on Fridays", use "routine" with day names.
 
 TODO RULES:
-- "add_todo": add items to the todo list. Include "todos" array with title and priority.
+- "add_todo": add items to the todo list. Include "todos" array with title, urgent (bool), and important (bool).
 - "toggle_todo": mark a todo as done/undone. Include todo_id and set done to true/false.
 - "delete_todo": remove a todo. Include todo_id.
+- Todos use the Eisenhower Matrix: each todo has "urgent" (true/false) and "important" (true/false).
+  - urgent + important = Do First
+  - important + not urgent = Schedule
+  - urgent + not important = Delegate
+  - not urgent + not important = Eliminate
+- When the user adds a todo without specifying urgency/importance, ASK or infer from context.
 
 CRITICAL RULES FOR UNDERSTANDING USER INTENT:
 1. When the user says "remove X" or "delete X" after discussing a specific day, they mean ONLY that day, not all instances.
@@ -191,10 +198,22 @@ def apply_changes(user_id, parsed):
     elif action == 'toggle_todo':
         for t in todos:
             if t.get('todo_id'):
-                todo_table.update_item(
-                    Key={'user_id': user_id, 'todo_id': t['todo_id']},
-                    UpdateExpression="SET done = :d",
-                    ExpressionAttributeValues={':d': t.get('done', True)})
+                update_expr = []
+                expr_vals = {}
+                if 'done' in t:
+                    update_expr.append('done = :d')
+                    expr_vals[':d'] = t['done']
+                if 'urgent' in t:
+                    update_expr.append('urgent = :u')
+                    expr_vals[':u'] = t['urgent']
+                if 'important' in t:
+                    update_expr.append('important = :i')
+                    expr_vals[':i'] = t['important']
+                if update_expr:
+                    todo_table.update_item(
+                        Key={'user_id': user_id, 'todo_id': t['todo_id']},
+                        UpdateExpression="SET " + ", ".join(update_expr),
+                        ExpressionAttributeValues=expr_vals)
     elif action == 'delete_todo':
         for t in todos:
             if t.get('todo_id'):

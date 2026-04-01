@@ -32,15 +32,28 @@ def handler(event, context):
     try:
         if event.get('httpMethod') == 'GET':
             resp = table.get_item(Key={'user_id': user_id})
-            colors = resp.get('Item', {}).get('colors', DEFAULT_COLORS)
-            return {'statusCode': 200, 'headers': cors_headers(), 'body': json.dumps({'colors': colors})}
+            item = resp.get('Item', {})
+            result = {'colors': item.get('colors', DEFAULT_COLORS)}
+            if 'wake_time' in item: result['wake_time'] = item['wake_time']
+            if 'sleep_time' in item: result['sleep_time'] = item['sleep_time']
+            return {'statusCode': 200, 'headers': cors_headers(), 'body': json.dumps(result)}
 
         if event.get('httpMethod') == 'PUT':
             body = json.loads(event.get('body', '{}'))
             colors = body.get('colors', {})
-            # Merge with defaults
+            # Separate wake/sleep from colors
+            wake = colors.pop('wake_time', None)
+            sleep = colors.pop('sleep_time', None)
             merged = {**DEFAULT_COLORS, **colors}
-            table.put_item(Item={'user_id': user_id, 'colors': merged})
-            return {'statusCode': 200, 'headers': cors_headers(), 'body': json.dumps({'colors': merged})}
+            item = {'user_id': user_id, 'colors': merged}
+            if wake:
+                item['wake_time'] = wake
+            if sleep:
+                item['sleep_time'] = sleep
+            table.put_item(Item=item)
+            resp_body = {'colors': merged}
+            if wake: resp_body['wake_time'] = wake
+            if sleep: resp_body['sleep_time'] = sleep
+            return {'statusCode': 200, 'headers': cors_headers(), 'body': json.dumps(resp_body)}
     except Exception as e:
         return {'statusCode': 500, 'headers': cors_headers(), 'body': json.dumps({'error': str(e)})}

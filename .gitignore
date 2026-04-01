@@ -1,0 +1,11 @@
+# Build artifacts
+sam-app/.aws-sam/
+sam-app/samconfig.toml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
